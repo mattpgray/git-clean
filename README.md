@@ -5,4 +5,3 @@ I always found myself with lots of old git branches that are no longer in use. `
 
 # Potential future features
 - Clean branches on remote repos
-- Work with renamed main/master branch.

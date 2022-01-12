@@ -135,6 +135,7 @@ func (pw *prefixWriter) Write(p []byte) (int, error) {
 		if err != nil {
 			return start + n, err
 		}
+		pw.started = false
 		start = newlineIdx + 1
 	}
 	return len(p), nil

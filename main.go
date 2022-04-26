@@ -18,7 +18,8 @@ import (
 )
 
 var (
-	force = flag.Bool("f", false, "Perform cleanup options.")
+	force   = flag.Bool("f", false, "Perform cleanup options.")
+	verbose = flag.Bool("v", false, "Verbose output.")
 )
 
 func main() {
@@ -34,7 +35,6 @@ func main() {
 	}
 
 	mergedBranches := getMergedBranches()
-	fmt.Println("Delete local branches:")
 	for _, branch := range mergedBranches {
 		msg := "[deleting]"
 		if !*force {
@@ -94,11 +94,17 @@ func runCmdDefaultTimeout(name string, args ...string) []byte {
 func runCmd(ctx context.Context, name string, args ...string) []byte {
 	cmd := exec.CommandContext(ctx, name, args...)
 	// FIXME: use a command strings that can be copy-pasted into the shell
-	fmt.Printf("[cmd] %s\n", cmd.String())
+	if *verbose {
+		fmt.Printf("[cmd] %s\n", cmd.String())
+	} // if
 
 	cmd.Stderr = &prefixWriter{prefix: "[cmd][stderr] ", w: os.Stderr}
 	stdout := &bytes.Buffer{}
-	cmd.Stdout = io.MultiWriter(&prefixWriter{prefix: "[cmd][stdout] ", w: os.Stdout}, stdout)
+	if *verbose {
+		cmd.Stdout = io.MultiWriter(&prefixWriter{prefix: "[cmd][stdout] ", w: os.Stdout}, stdout)
+	} else {
+		cmd.Stdout = stdout
+	}
 
 	if err := cmd.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "[error] error running command %s, %v\n", cmd.String(), err)
